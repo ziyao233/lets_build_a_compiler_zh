@@ -1,6 +1,6 @@
 # NOTICE
 
-*** I am looking for the original author Jack Crenshaw to get his permit for
+***I am looking for the original author Jack Crenshaw to get his permit for
 translation. Please contact me via ziyao@disroot.org***
 
 # 注意
