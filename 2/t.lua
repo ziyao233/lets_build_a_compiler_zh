@@ -103,7 +103,7 @@ local function divide()
 	match('/');
 	factor();
 	emitLine("xchgq	(%rsp),	%rax");
-	emitLine("cqoq");
+	emitLine("cqto");
 	emitLine("divq	(%rsp)");
 end
 
@@ -121,7 +121,7 @@ local function term()
 		else
 			expect("mulop");
 		end
-		emitLine("subq	8,	%rsp");
+		emitLine("addq	$8,	%rsp");
 	end
 end
 
@@ -158,7 +158,7 @@ expression = function()
 		else
 			expect("Addop");
 		end
-		emitLine("subq	$8,	%rsp");
+		emitLine("addq	$8,	%rsp");
 	end
 end
 

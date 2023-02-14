@@ -253,7 +253,7 @@ rdx 当作储存部分和的地方。现在看起来一切都那么完美，因�
 
 并在循环的结尾处加上
 
-		emitLine("subq	$8,	%rsp");
+		emitLine("addq	$8,	%rsp");
 
 add() 和 substract() 中的相应地改成
 
@@ -303,7 +303,7 @@ local function divide()
 	match('/');
 	factor();
 	emitLine("xchgq	(%rsp),	%rax");
-	emitLine("cqoq");
+	emitLine("cqto");
 	emitLine("divq	(%rsp)");
 end
 
@@ -321,7 +321,7 @@ local function term()
 		else
 			expect("mulop");
 		end
-		emitLine("subq	8,	%rsp");
+		emitLine("addq	$8,	%rsp");
 	end
 end
 
@@ -415,7 +415,7 @@ expression = function()
 		else
 			expect("Addop");
 		end
-		emitLine("subq	$8,	%rsp");
+		emitLine("addq	$8,	%rsp");
 	end
 end
 
@@ -461,7 +461,7 @@ local function expression()
 		else
 			expect("Addop");
 		end
-		emitLine("subq	$8,	%rsp");
+		emitLine("addq	$8,	%rsp");
 	end
 end
 
