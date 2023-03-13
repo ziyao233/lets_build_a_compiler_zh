@@ -18,7 +18,6 @@ local brfore_program = [[
     main:
         pushq	%rbp
         movq	%rsp, %rbp
-        movq	$3, a(%rip)
 ]];  --format before
 local after_program = [[
         movq    res(%rip), %rax
