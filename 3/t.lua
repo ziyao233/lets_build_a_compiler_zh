@@ -20,8 +20,7 @@ local brfore_program = [[
         movq	%rsp, %rbp
 ]];  --format before
 local after_program = [[
-        movq    res(%rip), %rax
-        movq    %rax, %rsi
+        movq    res(%rip), %rax movq    %rax, %rsi
         leaq    .LC0(%rip), %rdi
         movq    $0, %rax
         call    printf@PLT
