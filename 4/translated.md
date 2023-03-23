@@ -6,7 +6,7 @@ Jack W. Crenshaw, Ph.D.
 >版权许可
 >Copyright (C) 1988 Jack W. Crenshaw. 保留一切权力
 >本文由泠妄翻译
->本文由泠妄编写代码
+>本文由泠妄在梓瑶基础上编写代码
 
 ## 简介
 
@@ -376,4 +376,4 @@ until(look == '.')
 >版权声明
 >Copyright (c) 1988 Jack W. Crenshaw. 保留一切权利。
 >本文由泠妄翻译
->本文由泠妄编写代码
+>本文由泠妄在梓瑶基础上编写代码
