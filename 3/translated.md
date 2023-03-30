@@ -4,18 +4,11 @@ Jack W. Crenshaw, Ph.D.
 24 July 1988
 
 # 第三章： 更多的表达式
-<<<<<<< HEAD
->版权许可
->Copyright (C) 1988 Jack W. Crenshaw. 保留一切权力
->本文由泠妄翻译
->本文由泠妄在梓瑶的基础上编写代码
-=======
 
 > 版权许可
 > Copyright (C) 1988 Jack W. Crenshaw. 保留一切权力
-> 本文由泠妄翻译
+> 本文由泠妄翻译，梓瑶校订
 > 本文由泠妄在梓瑶的基础上编写代码
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 
 ## 简介
 
@@ -237,17 +230,12 @@ end
 
 ## 赋值语句
 
-<<<<<<< HEAD
-好的，现在我们已经有一个运行的不错的编译器了。我想要指出我们只写了234行可执行的代码。*（注：Lua是一门解释执行的语言，不和原文一样考虑编译后的大小）*
-考虑到我们并没有很努力的去尝试缩减源代码的长度，而只是遵循了KISS原则，这真的很令人惊讶。
-=======
 好的，现在我们已经有一个运行的不错的编译器了。我想要指出我们只写了
 234 行可执行的代码。考虑到我们并没有很努力的去尝试缩减源代码的长度，而
 只是遵循了 KISS 原则，这已经是个很喜人的结果了。
 
 当然，只是能编译表达式却之后什么都不去做并不够棒。表达式通常（虽然并不
 总是）以如下的形式出现在赋值语句中：
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 
 ```BNF
 <Ident> = <Expression>
@@ -508,11 +496,7 @@ end
 
 --[[ 识别是否是字母数字字符 ]]
 local function isAlNum(c)
-<<<<<<< HEAD
-    return isAlpha(c) or isDigit(c)
-=======
 	return isAlpha(c) or isDigit(c)
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 end
 
 --[[ 识别是否是加法符号 ]]
@@ -522,26 +506,15 @@ end
 
 --[[ 识别是否是空白字符 ]]
 local function isWhite(c)
-<<<<<<< HEAD
-    return c == ' ' or c == '\t';
-=======
 	return c == ' ' or c == '\t';
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 end
 
 --[[ 跳过前导空白字符 ]]
 local function skipWhite(c)
-<<<<<<< HEAD
-    while isWhite(look)
-    do
-        getChar();
-    end
-=======
 	while isWhite(look)
 	do
 		getChar();
 	end
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 end
 
 
@@ -558,60 +531,34 @@ end
 
 --[[ 读取一个标识符 ]]
 local function getName()
-<<<<<<< HEAD
-    local token = '';
-=======
 	local token = '';
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 	if not isAlpha(look)
 	then
 		expected("name");
 	end
 	while isAlNum(look)
-<<<<<<< HEAD
-    do
-        token = token .. look;
-        getChar();
-    end
-    skipWhite();
-    return token;
-=======
 	do
 		token = token .. look;
 		getChar();
 	end
 	skipWhite();
 	return token;
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 end
 
 --[[ 读取一个数字 ]]
 local function getNum()
-<<<<<<< HEAD
-    local value = '';
-=======
 	local value = '';
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 	if not isDigit(look)
 	then
 		expected("integer");
 	end
 	while isDigit(look)
-<<<<<<< HEAD
-    do
-        value = value .. look;
-        getChar();
-    end
-    skipWhite();
-    return value;
-=======
 	do
 		value = value .. look;
 		getChar();
 	end
 	skipWhite();
 	return value;
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 end
 
 --[[ 输出一个制表符和字符串 ]]
@@ -626,18 +573,6 @@ end
 
 --[[ 解析并翻译一个标识符 ]]
 local function ident()
-<<<<<<< HEAD
-    local name;
-    name = getName();
-    if look == '('
-    then 
-        match('(');
-        match(')');
-        emitLine('callq ' .. name);
-    else
-        emitLine('movq ' .. name ..'(%rip),	%rax');
-    end
-=======
 	local name;
 	name = getName();
 	if look == '('
@@ -648,26 +583,12 @@ local function ident()
 	else
 		emitLine('movq ' .. name ..'(%rip),	%rax');
 	end
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 end
 
 local expression;
 
 --[[ 解析并翻译一个数学因子 ]]
 local function factor()
-<<<<<<< HEAD
-    if look == '('
-    then
-        match('(');
-        expression();
-        match(')');
-    elseif isAlpha(look)
-    then
-        ident();
-    else
-        emitLine("movq	$" .. getNum() .. ",	%rax");
-    end
-=======
 	if look == '('
 	then
 		match('(');
@@ -679,7 +600,6 @@ local function factor()
 	else
 		emitLine("movq	$" .. getNum() .. ",	%rax");
 	end
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 end
 
 --[[ 解析并翻译一个乘法 ]]
@@ -754,15 +674,6 @@ end
 
 --[[ 解析并翻译一个赋值语句 ]]
 local function assignment()
-<<<<<<< HEAD
-    local name;
-    name = getName();
-    match('=');
-    expression();
-    emitLine('leaq ' .. name .. '(%rip), %rbx');
-    emitLine('movq %rax, (%rbx)');
-    -- emitLine('movq %rax, (' .. name .. ')');
-=======
 	local name;
 	name = getName();
 	match('=');
@@ -770,7 +681,6 @@ local function assignment()
 	emitLine('leaq ' .. name .. '(%rip), %rbx');
 	emitLine('movq %rax, (%rbx)');
 	-- emitLine('movq %rax, (' .. name .. ')');
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
 end
 
 --[[ 初始化 ]]
@@ -796,14 +706,7 @@ end
 们改变程序的行为时需要对它进行怎样的更改。哪怕你并不关心解释器，在那里
 学到的知识也会有利于我们接下来的学习。下次见~
 
-<<<<<<< HEAD
->版权声明
->Copyright (c) 1988 Jack W. Crenshaw. 保留一切权利。
->本文由泠妄翻译
->本文由泠妄在梓瑶的基础上编写代码
-=======
 > 版权声明
 > Copyright (c) 1988 Jack W. Crenshaw. 保留一切权利。
 > 本文由泠妄翻译，梓瑶校订
 > 本文由泠妄在梓瑶的基础上编写代码
->>>>>>> f0138ac0e582e49852e1f5f35cf0e96b5ead7ad3
