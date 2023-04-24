@@ -548,13 +548,13 @@ local function doFor()
 	match('=');
 	expression();
 	emitLine("deq %rax");
-	emitLine("movq <ident>(%rip), %rax");
+	emitLine("movq " .. name .. "(%rip), %rax");
 	expression();
 	emitLine("push %rax");
 	postLabel(L1);
-	emitLine("movq %rax, <ident>(%rip)");
+	emitLine("movq %rax, " .. name .. "(%rip)");
 	emitLine("inc %rax");
-	emitLine("movq <ident>(%rip), %rax");
+	emitLine("movq " .. name .. "(%rip), %rax");
 	emitLine("cmp %rax, (%rsp)");
 	emitLine("jgt " .. L2);
 	block();
@@ -977,18 +977,18 @@ local function doFor()
 	match('=');
 	expression();
 	emitLine("deq %rax");
-	emitLine("movq <ident>(%rip), %rax");
+	emitLine("movq " .. name .. "(%rip), %rax");
 	expression();
 	emitLine("push %rax");
 	postLabel(L1);
-	emitLine("movq %rax, <ident>(%rip)");
+	emitLine("movq %rax, " .. name .. "(%rip)");
 	emitLine("inc %rax");
-	emitLine("movq <ident>(%rip), %rax");
+	emitLine("movq " .. name .. "(%rip), %rax");
 	emitLine("cmp %rax, (%rsp)");
 	emitLine("jgt " .. L2);
-	block(L2);
+	block();
 	match('e');
-	emitLine("jmp L1 " .. L1);
+	emitLine("jmp " .. L1);
 	postLabel(L2);
 	emitLine("addq %rsp, $8")
 end

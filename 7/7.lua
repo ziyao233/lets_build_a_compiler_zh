@@ -44,6 +44,11 @@ local function isWhite(c)
     return c == ' ' or c == '\t';
 end
 
+--[[ 将字符转为大写 ]]
+local function upCase(c)
+    return string.upper(c);
+end
+
 --[[判断给定值是否出现在数组中]]
 local function isInArr(s, arr)
 	for k,v in pairs(arr)
@@ -62,6 +67,18 @@ local function skipWhite(c)
     do
         getChar();
     end
+end
+
+--[[ 跳过CRLF ]]
+local function fin()
+	if look == '\r'
+	then
+		getChar();
+	end
+	if look == '\n'
+	then
+		getChar();
+	end
 end
 
 --[[ 匹配一个特定的字符 ]]
@@ -124,25 +141,290 @@ local function postLabel(label)
     writeLine(label .. ':');
 end
 
---[[识别并翻译一个表达式]]
---[[该函数并未被实现]]
-local function expression()
-    emitLine('<expr>');
+--[[ 识别是否是加法符号 ]]
+local function isAddop(c)
+	return c == '+' or c== '-';
 end
 
---[[识别并翻译一个布尔表达式]]
---[[该函数并未被实现]]
-local function condition()
-    emitLine('<condition>');
+--[[ 识别一个Orop ]]
+local function isOrop(c)
+	return c == '|' or c == '~';
+end
+
+--[[ 识别一个关系op ]]
+local function isRelop(c)
+	return c == '=' or c == '#' or c == '<' or c == '>';
+end
+
+--[[ 解析并翻译一个标识符 ]]
+local function ident()
+    local name;
+    name = getName();
+    if look == '('
+    then 
+        match('(');
+        match(')');
+        emitLine('callq ' .. name);
+    else
+        emitLine('movq ' .. name ..'(%rip),	%rax');
+    end
+end
+
+--[[ 识别一个布尔变量 ]]
+local function isBoolean(c)
+    return upCase(c) == 'T' or upCase(c) == 'F';
+end
+
+--[[ 获取一个布尔变量 ]]
+local function getBoolean()
+    if not isBoolean(look)
+    then
+        expected("Boolean Literal");
+    end
+    local b = upCase(look) == 'T';
+    getChar();
+    return b;
+end
+
+
+local forward;
+local expression;
+
+--[[ 解析并翻译一个数学因子 ]]
+local function factor()
+    if look == '('
+    then
+        match('(');
+        expression();
+        match(')');
+    elseif isAlpha(look)
+    then
+        ident();
+    else
+        emitLine("movq	$" .. getNum() .. ",	%rax");
+    end
+end
+
+--[[ 解析并翻译第一个数学因子 ]]
+local function signedFactor()
+	if look == '+'
+	then
+		getChar();
+		if look == '-'
+		then 
+			getChar();
+			if isDigit(look)
+			then
+				emitLine('movq $-' .. getNum() .. ', %rax');
+			else
+				factor();
+				emitLine('negq %rax');
+			end
+		end
+	else
+		factor();
+	end
+end
+
+--[[ 识别并翻译一个乘法 ]]
+local function multiply()
+	match('*');
+	factor();
+	emitLine('imulq (%rsp)');
+end
+
+--[[ 识别并翻译一个除法 ]]
+local function divide()
+	match('/');
+	factor();
+	emitLine("xchgq	(%rsp),	%rax");
+	emitLine('cqto');
+	emitLine('idivq (%rsp)');
+end
+
+--[[ 解析并翻译一个数学项 ]]
+local function term()
+	factor();
+	while look == '*' or look == '/'
+	do
+		emitLine('pushq %rax');
+		if look == '*'
+		then
+			multiply();
+		elseif look == '/'
+		then
+			divide();
+		end
+		emitLine("addq $8,	%rsp")
+	end
+end
+
+--[[ 识别并翻译一个加法 ]]
+local function add()
+	match('+');
+	term();
+	emitLine('addq (%rsp), %rax');
+end
+
+--[[ 识别并翻译一个减法 ]]
+local function subtract()
+	match('-');
+	term();
+	emitLine('subq (%rsp), %rax');
+	emitLine('negq %rax');
+end
+
+--[[ 解析并翻译一个数学表达式 ]]
+function expression()
+	term();
+	while isAddop(look)
+	do
+		emitLine('pushq %rax');
+		if look == '+'
+		then
+			add();
+		elseif look == '-'
+		then
+			subtract()
+		end
+		emitLine("addq	$8,	%rsp");
+	end
+end
+
+--[[ 识别并翻译一个等于关系 ]]
+local function equals()
+	match('=');
+	expression();
+	emitLine('cmpq (%rsp), %rax');
+	emitLine('sete %rax');
+end
+
+--[[ 识别并翻译一个不等于关系 ]]
+local function notEquals()
+	match('#');
+	expression();
+	emitLine('cmpq (%rsp), %rax');
+	emitLine('setne %rax');
+end
+
+--[[ 识别并翻译一个小于关系 ]]
+local function less()
+	match('<');
+	expression();
+	emitLine('cmpq (%rsp), %rax');
+	emitLine('setl %rax');
+end
+
+--[[ 识别并翻译一个大于关系 ]]
+local function greater()
+	match('>');
+	expression();
+	emitLine('cmpq (%rsp), %rax');
+	emitLine('setg %rax');
+end
+
+--[[ 解析并翻译一个关系 ]]
+local function relation()
+	expression();
+	if isRelop(look)
+	then
+		emitLine('pushq %rax');
+		if look == '='
+		then
+			equals();
+		elseif look == '#'
+		then
+			notEquals();
+		elseif look == '<'
+		then
+			less();
+		elseif look == '>'
+		then
+			greater();
+		end
+		emitLine("addq	$8,	%rsp");
+		emitLine('test %rax, %rax');
+	end
+end
+
+--[[ 解析并翻译一个布尔因子 ]]
+local function boolFactor()
+	if isBoolean(look)
+	then
+		if getBoolean()
+		then
+			emitLine('movq $-1, %rax');
+		else 
+			emitLine('xorq %rax, %rax');
+		end
+	else
+		relation();
+	end
+end
+
+--[[ 解析并翻译一个带NOT的布尔因子 ]]
+local function notFactor()
+	if look == '!'
+	then
+		match('!');
+		boolFactor();
+		emitLine('xorq $-1, %rax');
+	else
+		boolFactor();
+	end
+end
+
+--[[ 解析并翻译一个布尔项 ]]
+local function boolTerm()
+	notFactor();
+	while look == '&'
+	do
+		emitLine('pushq %rax');
+		match('&');
+		notFactor();
+		emitLine('andq (%rsp), %rax');
+		emitLine("addq	$8,	%rsp");
+	end
+end
+
+--[[ 识别并翻译一个或运算符 ]]
+local function boolOr()
+    match('|');
+    boolTerm();
+    emitLine('orq (%rsp), %rax');
+	
+end
+
+--[[ 识别并翻译一个异或运算符 ]]
+local function boolXor()
+	match('~');
+	boolTerm();
+	emitLine('xorq (%rsp), %rax');
+end
+
+--[[ 识别并翻译一个布尔表达式 ]]
+local function boolExpression()
+	boolTerm();
+	while isOrop(look)
+	do
+		emitLine('pushq %rax');
+		if look == '|'
+		then
+			boolOr();
+		elseif look == '~'
+		then
+			boolXor();
+		end
+		emitLine("addq	$8,	%rsp");
+	end
 end
 
 local block;
-local forward;
 
 --[[识别并翻译一个IF结构]]
 local function doIf(L)
     match('i');
-    condition();
+    boolExpression();
 	local L1 = newLabel();
 	local L2 = L1;
     emitLine('jz ' .. L1);
@@ -166,7 +448,7 @@ local function doWhile()
 	L1 = newLabel();
 	L2 = newLabel();
 	postLabel(L1);
-	condition();
+	boolExpression();
 	emitLine('jz ' .. L2);
 	block(L2);
 	match('e');
@@ -194,7 +476,7 @@ local function doRepeat()
 	postLabel(L1);
 	block(L2);
 	match('u');
-	condition();
+	boolExpression();
 	emitLine('jz ' .. L1);
 	postLabel(L2);
 end
@@ -258,6 +540,14 @@ local function other()
     emitLine(getName());
 end
 
+--[[ 解析并翻译一个赋值语句 ]]
+local function assignment()
+    local name = getName();
+    match('=');
+    boolExpression();
+	emitLine('movq ' .. name .. '(%rip), %rax');
+end
+
 local skip_keywords = {
 	__mode="k, v",
 	['e'] = 1,
@@ -269,6 +559,7 @@ local skip_keywords = {
 function block(L)
     while not skip_keywords[look]
     do
+		fin();
         if look == 'i'
         then
             doIf(L);
@@ -291,8 +582,9 @@ function block(L)
 		then
 			doBreak(L);
         else
-            other();
+            assignment();
         end
+		fin();
     end
 end
 
