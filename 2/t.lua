@@ -1,8 +1,8 @@
-local io		= require "io";
-local string		= require "string";
-local math		= require "math";
+local io     = require "io";
+local string = require "string";
+local math   = require "math";
 
-local look = '';		-- 向前看字符
+local look   = ''; -- 向前看字符
 
 --[[ 从输入读取新的字符 ]]
 local function getChar()
@@ -30,12 +30,12 @@ end
 --	匹配失败则返回 nil。Lua 中 nil 和 false 都作为逻辑假处理
 --]]
 local function isAlpha(c)
-	return string.match(c,"%a");
+	return string.match(c, "%a");
 end
 
 --[[ 识别是否是数字。相对的，%d 能够匹配一位数字 ]]
 local function isDigit(c)
-	return string.match(c,"%d");
+	return string.match(c, "%d");
 end
 
 --[[ 读取一个标识符 ]]
@@ -119,7 +119,7 @@ local function term()
 		then
 			divide();
 		else
-			expect("mulop");
+			expected("mulop");
 		end
 		emitLine("addq	$8,	%rsp");
 	end
@@ -141,7 +141,7 @@ end
 expression = function()
 	if isAddop(look)
 	then
-		emitLine("xorq	%rax,	%rax");	-- 清零
+		emitLine("xorq	%rax,	%rax"); -- 清零
 	else
 		term();
 	end
@@ -156,7 +156,7 @@ expression = function()
 		then
 			substract();
 		else
-			expect("Addop");
+			expected("Addop");
 		end
 		emitLine("addq	$8,	%rsp");
 	end

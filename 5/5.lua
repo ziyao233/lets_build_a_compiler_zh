@@ -1,9 +1,9 @@
-local io		= require "io";
-local string		= require "string";
-local math		= require "math";
+local io     = require "io";
+local string = require "string";
+local math   = require "math";
 
-local look = '';		-- 向前看字符
-local lCount = 0;       -- Label计数
+local look   = ''; -- 向前看字符
+local lCount = 0; -- Label计数
 
 --[[ 从输入读取新的字符 ]]
 local function getChar()
@@ -21,32 +21,32 @@ end
 --	匹配失败则返回 nil。Lua 中 nil 和 false 都作为逻辑假处理
 --]]
 local function isAlpha(c)
-	return string.match(c,"%a");
+	return string.match(c, "%a");
 end
 
 --[[ 识别是否是数字。相对的，%d 能够匹配一位数字 ]]
 local function isDigit(c)
-	return string.match(c,"%d");
+	return string.match(c, "%d");
 end
 
 --[[ 识别是否是字母数字字符 ]]
 local function isAlNum(c)
-    return isAlpha(c) or isDigit(c)
+	return isAlpha(c) or isDigit(c)
 end
 
 --[[ 识别是否是加法符号 ]]
 local function isAddop(c)
-	return c == '+' or c== '-';
+	return c == '+' or c == '-';
 end
 
 --[[ 识别是否是空白字符 ]]
 local function isWhite(c)
-    return c == ' ' or c == '\t';
+	return c == ' ' or c == '\t';
 end
 
 --[[判断给定值是否出现在数组中]]
 local function isInArr(s, arr)
-	for k,v in pairs(arr)
+	for k, v in pairs(arr)
 	do
 		if s == v
 		then
@@ -58,10 +58,10 @@ end
 
 --[[ 跳过前导空白字符 ]]
 local function skipWhite(c)
-    while isWhite(look)
-    do
-        getChar();
-    end
+	while isWhite(look)
+	do
+		getChar();
+	end
 end
 
 --[[ 匹配一个特定的字符 ]]
@@ -109,31 +109,31 @@ end
 
 --[[ 输出指定的字符串，然后换行]]
 local function writeLine(s)
-    io.write(s .. "\n");
+	io.write(s .. "\n");
 end
 
 --[[生成一个唯一的标识符]]
 local function newLabel()
-    local label = 'L' .. string.format("%d",lCount);
-    lCount = lCount + 1;
-    return label
+	local label = 'L' .. string.format("%d", lCount);
+	lCount = lCount + 1;
+	return label
 end
 
 --[[输出一个标识符]]
 local function postLabel(label)
-    writeLine(label .. ':');
+	writeLine(label .. ':');
 end
 
 --[[识别并翻译一个表达式]]
 --[[该函数并未被实现]]
 local function expression()
-    emitLine('<expr>');
+	emitLine('<expr>');
 end
 
 --[[识别并翻译一个布尔表达式]]
 --[[该函数并未被实现]]
 local function condition()
-    emitLine('<condition>');
+	emitLine('<condition>');
 end
 
 local block;
@@ -141,12 +141,12 @@ local forward;
 
 --[[识别并翻译一个IF结构]]
 local function doIf(L)
-    match('i');
-    condition();
+	match('i');
+	condition();
 	local L1 = newLabel();
 	local L2 = L1;
-    emitLine('jz ' .. L1);
-    block(L);
+	emitLine('jz ' .. L1);
+	block(L);
 	if look == 'l'
 	then
 		match('l');
@@ -155,8 +155,8 @@ local function doIf(L)
 		postLabel(L1);
 		block(L);
 	end
-    match('e');
-    postLabel(L2);
+	match('e');
+	postLabel(L2);
 end
 
 --[[识别并翻译一个WHILE语句]]
@@ -182,7 +182,7 @@ local function doLoop()
 	postLabel(L1);
 	block(L2);
 	match('e');
-	emitLine('jmp ' .. L);
+	emitLine('jmp ' .. L1);
 	postLabel(L2);
 end
 
@@ -255,11 +255,11 @@ end
 
 --[[识别并翻译一个“其它”块]]
 local function other()
-    emitLine(getName());
+	emitLine(getName());
 end
 
 local skip_keywords = {
-	__mode="k, v",
+	__mode = "k, v",
 	['e'] = 1,
 	['l'] = 1,
 	['u'] = 1
@@ -267,11 +267,11 @@ local skip_keywords = {
 
 --[[识别并翻译一个语句块]]
 function block(L)
-    while not skip_keywords[look]
-    do
-        if look == 'i'
-        then
-            doIf(L);
+	while not skip_keywords[look]
+	do
+		if look == 'i'
+		then
+			doIf(L);
 		elseif look == 'w'
 		then
 			doWhile();
@@ -281,7 +281,7 @@ function block(L)
 		elseif look == 'r'
 		then
 			doRepeat();
-        elseif look == 'f'
+		elseif look == 'f'
 		then
 			doFor();
 		elseif look == 'd'
@@ -290,20 +290,20 @@ function block(L)
 		elseif look == 'b'
 		then
 			doBreak(L);
-        else
-            other();
-        end
-    end
+		else
+			other();
+		end
+	end
 end
 
 --[[解析并翻译一个程序]]
 local function doProgram()
-    block('');
-    if look ~= 'e'
-    then
-        expected('End');
-    end
-    emitLine('END');
+	block('');
+	if look ~= 'e'
+	then
+		expected('End');
+	end
+	emitLine('END');
 end
 
 --[[ 初始化 ]]
