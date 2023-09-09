@@ -637,7 +637,7 @@ local function doLoop()
 	postLabel(L1);
 	block(L2);
 	match('e');
-	emitLine('jmp ' .. L);
+	emitLine('jmp ' .. L1);
 	postLabel(L2);
 end
 ```

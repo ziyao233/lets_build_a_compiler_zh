@@ -498,7 +498,7 @@ end
 
 --[[ 解析并翻译一个数学项 ]]
 local function term()
-	factor();
+	signedFactor();
 	while look == '*' or look == '/'
 	do
 		emitLine('pushq %rax');
